@@ -1,4 +1,4 @@
-#include "sc/sc.hpp"
+#include "sc/SCClient.hpp"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 

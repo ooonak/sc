@@ -1,12 +1,4 @@
-#include "sc/sc.hpp"
-#include <vector>
-#include <string>
+#include "sc/SCClient.hpp"
+#include "spdlog/spdlog.h"
 
-int main() {
-    sc();
-
-    std::vector<std::string> vec;
-    vec.push_back("test_package");
-
-    sc_print_vector(vec);
-}
+int main() { SCClient("/tmp/example.sock", spdlog::default_logger()); }

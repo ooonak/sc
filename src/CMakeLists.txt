@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.30.3)
 project(sc CXX)
 
 add_library(sc
-  ../include/sc/sc.hpp
-  sc.cpp)
+  ../include/sc/SCClient.hpp
+  SCClient.cpp)
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC

@@ -46,9 +46,9 @@ jobs:
 
       - name: Run Tests with Coverage
         run: |
-          LLVM_PROFILE_FILE="coverage.profraw" ./build/Debug/tests/clrppTests
+          LLVM_PROFILE_FILE="coverage.profraw" ./build/Debug/tests/csTests
           llvm-profdata merge -sparse coverage.profraw -o coverage.profdata
-          llvm-cov report ./build/Debug/tests/clrppTests -instr-profile=coverage.profdata -use-color > coverage.txt
+          llvm-cov report ./build/Debug/tests/csTests -instr-profile=coverage.profdata -use-color > coverage.txt
 
       - name: Extract Coverage Percentage
         run: |
@@ -61,4 +61,3 @@ jobs:
           git add README.md
           git commit -m "Update coverage badge" || echo "No changes to commit"
           git push origin main
-

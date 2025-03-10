@@ -42,7 +42,7 @@ jobs:
         run: conan build . -pr x86_64-clang-18-debug --build=missing
 
       - name: Valgrind memleak
-        run: valgrind --leak-check=full --track-origins=yes --trace-children=yes ./build/Debug/tests/clrppTests
+        run: valgrind --leak-check=full --track-origins=yes --trace-children=yes ./build/Debug/tests/csTests
 
       - name: ASan - Address Sanitizer
         run: conan build . -pr x86_64-clang-18-asan --build=missing
