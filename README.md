@@ -1,3 +1,7 @@
+[![Build and test](https://github.com/ooonak/sc/actions/workflows/ci.yaml/badge.svg)](https://github.com/ooonak/sc/actions/workflows/ci.yaml)
+[![Static analysis](https://github.com/ooonak/sc/actions/workflows/static-analysis.yaml/badge.svg)](https://github.com/ooonak/sc/actions/workflows/static-analysis.yaml)
+[![Dynamic analysis](https://github.com/ooonak/sc/actions/workflows/dynamic-analysis.yaml/badge.svg)](https://github.com/ooonak/sc/actions/workflows/dynamic-analysis.yaml)
+
 # Simple Communicator (SC)
 C++ library for connection oriented message based communication over unix domain sockets.
 
