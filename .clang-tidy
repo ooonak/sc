@@ -1,0 +1,32 @@
+---
+Checks: '
+        clang-diagnostic-*,
+        clang-analyzer-*,
+        bugprone-*,
+        cert-*,
+        clang-analyzer-*,
+        concurrency-*,
+        cppcoreguidelines-*,
+        google-*,
+        llvm-*,-llvm-include-order,-llvm-header-guard,
+        misc-*,
+        modernize-*,-modernize-use-trailing-return-type,
+        performance-*,
+        portability-*,
+        readability-*
+        '
+WarningsAsErrors: ''
+HeaderFileExtensions:
+  - h
+  - hh
+  - hpp
+  - hxx
+ImplementationFileExtensions:
+  - c
+  - cc
+  - cpp
+  - cxx
+HeaderFilterRegex: '(^gtest)/.*'
+FormatStyle:     file
+SystemHeaders:   false
+...

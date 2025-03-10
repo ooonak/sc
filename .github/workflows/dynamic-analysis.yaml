@@ -1,0 +1,55 @@
+name: Dynamic analysis
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get -y install ninja-build ccache valgrind
+
+      - name: Install Conan
+        run: pip install conan
+
+      - name: Conan version
+        run: conan --version
+
+      - name: Setup Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.conan2/p/
+          key: ${{ runner.os }}-conan-${{ hashFiles('**/conan.lock') }}
+
+      - name: Setup default profile
+        run: conan profile detect
+
+      - name: Install profiles
+        run: conan config install https://github.com/ooonak/conanconf.git -t git --args="-b main" -sf=profiles -tf=profiles
+
+      - name: Build
+        run: conan build . -pr x86_64-clang-18-debug --build=missing
+
+      - name: Valgrind memleak
+        run: valgrind --leak-check=full --track-origins=yes --trace-children=yes ./build/Debug/tests/clrppTests
+
+      - name: ASan - Address Sanitizer
+        run: conan build . -pr x86_64-clang-18-asan --build=missing
+
+      - name: UBSan - Undefined Behaviour Sanitizer
+        run: conan build . -pr x86_64-clang-18-ubsan --build=missing
+
+      - name: TSan - Thread Sanitizer
+        run: conan build . -pr x86_64-clang-18-tsan --build=missing
+

@@ -1,0 +1,64 @@
+name: Coverage
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get -y install ninja-build llvm llvm-dev
+
+      - name: Install Conan
+        run: pip install conan
+
+      - name: Conan version
+        run: conan --version
+
+      - name: Setup Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.conan2/p/
+          key: ${{ runner.os }}-conan-${{ hashFiles('**/conan.lock') }}
+
+      - name: Setup default profile
+        run: conan profile detect
+
+      - name: Install profiles
+        run: conan config install https://github.com/ooonak/conanconf.git -t git --args="-b main" -sf=profiles -tf=profiles
+
+      - name: Install dependencies
+        run: conan install . -pr x86_64-clang-18-coverage --build=missing
+
+      - name: Build
+        run: conan build . -pr x86_64-clang-18-coverage
+
+      - name: Run Tests with Coverage
+        run: |
+          LLVM_PROFILE_FILE="coverage.profraw" ./build/Debug/tests/clrppTests
+          llvm-profdata merge -sparse coverage.profraw -o coverage.profdata
+          llvm-cov report ./build/Debug/tests/clrppTests -instr-profile=coverage.profdata -use-color > coverage.txt
+
+      - name: Extract Coverage Percentage
+        run: |
+          COVERAGE=$(grep -o 'TOTAL.*[0-9]\{1,3\}\.[0-9]\{2\}%' coverage.txt | awk '{print $NF}' | tr -d '%')
+          echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
+
+      - name: Update Coverage Badge in README
+        run: |
+          sed -i "s|!\[Coverage\](https://badgen.net/badge/coverage/.*%25/green)|![Coverage](https://badgen.net/badge/coverage/${{ env.COVERAGE }}%25/green)|" README.md
+          git add README.md
+          git commit -m "Update coverage badge" || echo "No changes to commit"
+          git push origin main
+

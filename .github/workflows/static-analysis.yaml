@@ -1,0 +1,48 @@
+name: Static analysis
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get -y install ninja-build ccache cppcheck
+
+      - name: Install Conan
+        run: pip install conan
+
+      - name: Conan version
+        run: conan --version
+
+      - name: Setup Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.conan2/p/
+          key: ${{ runner.os }}-conan-${{ hashFiles('**/conan.lock') }}
+
+      - name: Setup default profile
+        run: conan profile detect
+
+      - name: Install profiles
+        run: conan config install https://github.com/ooonak/conanconf.git -t git --args="-b main" -sf=profiles -tf=profiles
+
+      - name: Build
+        run: conan build . -pr x86_64-clang-18-debug --build=missing
+
+      - name: clang-tidy
+        run: find src include -type f \( -name '*.cpp' -o -name '*.hpp' \) | xargs clang-tidy -p build/Debug -header-filter='^$(pwd)/src/|^$(pwd)/include/'
+
+      - name: CppCheck
+        run: cppcheck --suppressions-list=CppCheckSuppressions.txt --project=build/Debug/compile_commands.json --error-exitcode=1 --suppress=missingIncludeSystem --quiet
