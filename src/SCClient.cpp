@@ -17,7 +17,7 @@ SCClient::~SCClient() {
   if (client_fd != -1) {
     close(client_fd);
   }
-  spdlog::info("Shutting down.");
+  spdlog::info("Shutting down (~SCClient)");
 }
 
 void SCClient::setNonBlocking(int fd) {
@@ -28,6 +28,8 @@ void SCClient::setNonBlocking(int fd) {
 }
 
 bool SCClient::connectToServer() {
+  spdlog::info("About to connect to {}", socketPath);
+
   connectionState = State::CONNECTING;
   client_fd = socket(AF_UNIX, SOCK_STREAM, 0);
   if (client_fd == -1) {
@@ -105,7 +107,8 @@ void SCClient::receiveLoop() {
       if (receiveCb) {
         receiveCb(recvBuffer, bytes_received);
       }
-    } else if (bytes_received == 0 ||
+    }
+    else if (bytes_received == 0 ||
                (bytes_received == -1 && errno != EAGAIN)) {
       spdlog::warn("Connection lost, attempting to reconnect...");
       running = false;

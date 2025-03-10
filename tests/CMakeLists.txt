@@ -4,6 +4,8 @@ project(scTests LANGUAGES CXX)
 
 add_executable(${PROJECT_NAME}
   SCClientTests.cpp
+  TestServer.hpp
+  TestServer.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
